@@ -1,7 +1,10 @@
 API_URL = 'https://api.artifactsmmo.com'
 API_SECRET = require('secret')
-API_TIMEOUT = 0
 
-local k = require('artifacts.character').new('Kukuruz')
+local mc = require('api.my_characters')
+local c = require('api.characters')
+
+local r = c.create('Kukuruz', c.skins.men1)
+print(r.status)
 
 
