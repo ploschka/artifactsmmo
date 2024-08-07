@@ -1,3 +1,6 @@
+---@todo Implement caching
+local cache = {}
+
 local function create_request(url, method)
     local http_request = require('http.request')
     local req = http_request.new_from_uri(url)
