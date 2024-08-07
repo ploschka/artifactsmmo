@@ -19,43 +19,16 @@ function New_char(name, func)
     }
 end
 
-local mc = require('api.my_characters')
 local g = require('api.general')
-
-local ku = New_char('Kukuruz', function(name)
-    for i = 1, 111 do
-        print(i)
-        local r = mc.gathering(name)
-        print(r.status)
-        if r.status ~= 200 then
-            error "Error"
-        end
-        coroutine.yield(r.body.data.cooldown.remaining_seconds, r.body.data.cooldown.expiration)
-    end
-    return false
-end)
-
-local ka = New_char('Kapusta', function(name)
-    for i = 1, 99 do
-        print(i)
-        local r = mc.gathering(name)
-        print(r.status)
-        if r.status ~= 200 then
-            error "Error"
-        end
-        coroutine.yield(r.body.data.cooldown.remaining_seconds, r.body.data.cooldown.expiration)
-    end
-    return false
-end)
 
 local curr_time
 local wait_seconds = 0
-local queue = {}
+local queue = require('chars')
+local goloop
 
-table.insert(queue, ku)
-table.insert(queue, ka)
-
-while wait_seconds do
+repeat
+    goloop = false
+    print('Sleep ' .. wait_seconds .. ' seconds')
     sleep(wait_seconds)
     local t = g.server_time()
     if t.status ~= 200 then
@@ -63,18 +36,22 @@ while wait_seconds do
     end
     curr_time = t.body.time
     for i = 1, #queue do
+        goloop = goloop or queue[i]
+        if not queue[i] then
+            goto continue
+        end
         if (queue[i].expiration or '') < curr_time then
             local temp
             _, temp, queue[i].expiration = assert(coroutine.resume(queue[i].co, queue[i].name))
             if not temp then
-                table.remove(queue, i)
+                queue[i] = nil
                 goto continue
             end
-            if temp < wait_seconds then
+            if temp < wait_seconds or wait_seconds == 0 then
                 wait_seconds = temp
             end
         end
         ::continue::
     end
-end
+until not goloop
 
