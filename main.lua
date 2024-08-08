@@ -30,6 +30,7 @@ repeat
     goloop = false
     print('Sleep ' .. wait_seconds .. ' seconds')
     sleep(wait_seconds)
+    wait_seconds = 0
     local t = g.server_time()
     if t.status ~= 200 then
         error('Server time error')
