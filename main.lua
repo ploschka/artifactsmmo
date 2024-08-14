@@ -1,5 +1,4 @@
 API_URL = 'http://api.artifactsmmo.com'
-SERVER_URL = 'http://artifactsmmo.com'
 API_SECRET = require('secret')
 
 local function sleep(seconds)
@@ -31,11 +30,11 @@ repeat
     print('Sleep ' .. wait_seconds .. ' seconds')
     sleep(wait_seconds)
     wait_seconds = 0
-    local t = g.server_time()
+    local t = g.check_status()
     if t.status ~= 200 then
         error('Server time error')
     end
-    curr_time = t.body.time
+    curr_time = t.body.data.server_time
     for i = 1, #queue do
         goloop = goloop or queue[i]
         if not queue[i] then
