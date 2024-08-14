@@ -36,9 +36,13 @@ local function api_request(path, method, body)
     local response_body = assert(stream:get_body_as_string())
 
     local status = tonumber(headers:get(':status'))
+    local obj, _, err = require('dkjson').decode(response_body)
+    if not obj then
+        error(err)
+    end
     return {
         status = status,
-        body = require('dkjson').decode(response_body)
+        body = obj,
     }
 end
 
@@ -62,7 +66,7 @@ local function url_request(url, method, body)
     local status = tonumber(headers:get(':status'))
     return {
         status = status,
-        body = require('dkjson').decode(response_body)
+        body = response_body,
     }
 end
 
