@@ -1,6 +1,7 @@
 API_URL = 'http://api.artifactsmmo.com'
 API_SECRET = require('secret')
 
+---@param seconds number
 local function sleep(seconds)
     if seconds == 0 then
         return
@@ -8,6 +9,15 @@ local function sleep(seconds)
 
     local file = assert(io.popen('sleep ' .. seconds))
     file:close()
+end
+
+---@param t string
+---@return number timestamp
+local function parse_time(t)
+    local p = '(%d+)-(%d+)-(%d+)T(%d+):(%d+):(%d+).%d+Z'
+    local year, month, day, hour, minute, second = t:match(p)
+    local offset = os.time()-os.time(os.date('!*t'))
+    return os.time({year=year, month=month, day=day, hour=hour, min=minute, sec=second}) + offset
 end
 
 function New_char(name, func)
@@ -31,6 +41,7 @@ repeat
     sleep(wait_seconds)
     wait_seconds = 0
     local t = g.check_status()
+    print("Server response status", t.status)
     if t.status ~= 200 then
         error('Server time error')
     end
