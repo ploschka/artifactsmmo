@@ -34,11 +34,19 @@ local function api_request(path, method, body)
 
     local headers, stream = assert(req:go())
     local response_body = assert(stream:get_body_as_string())
+    local obj = nil
+    local err = nil
 
     local status = tonumber(headers:get(':status'))
-    local obj, _, err = require('dkjson').decode(response_body)
-    if not obj then
-        error(err)
+    if #response_body ~= 0 then
+        obj, _, err = require('dkjson').decode(response_body)
+        if not obj then
+            for name, value, _ in headers:each() do
+                io.stderr:write(string.format('%s: %s\n', name, value))
+            end
+            io.stderr:write(response_body)
+            error(err)
+        end
     end
     return {
         status = status,
